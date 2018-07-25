@@ -37,30 +37,36 @@ public class Operacao implements Runnable {
             int porta = 9876;
 
             InetAddress IPAddress = InetAddress.getByName(servidor);
+            
+            int contRequisicoes = 0;
 
             while (true) {
+                
+                long inicioRequisicao = Monitor.tempoInicial();
 
                 byte[] sendData = criaOperacao(valor);
+                
+                int resultadoEsperado = Monitor.resultadoEsperado(sendData);
 
                 DatagramPacket sendPacket = new DatagramPacket(sendData,
                         sendData.length, IPAddress, porta);
 
-                long tempoInicio = System.currentTimeMillis();
+                long tempoInicio = Monitor.tempoInicial();
 
                 clientSocket.send(sendPacket);
+                contRequisicoes++;
                 requisicoes++;
 
                 if (requisicoes == 10) {
 
-                    long tempoFinal = System.currentTimeMillis();
-                    long dif = (tempoFinal - tempoInicio);
+                    long tempoFinal = Monitor.tempoFinal(tempoInicio);
 
-                    long tempoSono = 1000 - dif;
+                    long tempoSono = 1000 - tempoFinal;
                     Thread.sleep(tempoSono);
 
-                    System.out.println("Requisicoes enviadas :" + requisicoes);
                     requisicoes = 0;
                     
+                    System.out.println("");
                 }
 
                 byte[] receiveData = new byte[Integer.BYTES];
@@ -70,7 +76,15 @@ public class Operacao implements Runnable {
 
                 clientSocket.receive(receivePacket);
 
-                atualizarValor(receivePacket);
+                int resultadoObtido = atualizarValor(receivePacket);
+                String stringOperacao = Monitor.strigOperacao(sendData);
+                
+                long finalRequisicao = Monitor.tempoFinal(inicioRequisicao);
+                
+                System.out.println("Requisicao " + contRequisicoes + " Operacao:" + 
+                        stringOperacao + "/ Resutado esperado: " + resultadoEsperado +
+                        "/ Resultado Obtido: " + resultadoObtido + "/ Operação realizada em: " 
+                        + finalRequisicao + " MLS");
             }
 
         } catch (IOException ex) {
@@ -122,13 +136,12 @@ public class Operacao implements Runnable {
 
     }
 
-    public static void atualizarValor(DatagramPacket receivePacket) {
+    public static int atualizarValor(DatagramPacket receivePacket) {
 
         ByteBuffer bff = ByteBuffer.wrap(receivePacket.getData());
         int resultado = bff.getInt();
         valor = resultado;
-        //System.out.println("O valor atual é " + resultado);
-
+        return resultado;
     }
 
 }

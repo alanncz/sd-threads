@@ -54,8 +54,6 @@ public class Server {
         int valor1 = bff.getInt();
         int valor2 = bff.getInt();
         char operacao = bff.getChar();
-        
-        System.out.println(valor1 + "-" + valor2 + "-" + operacao);
 
         int resultadoOperacao;
 

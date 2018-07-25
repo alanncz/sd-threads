@@ -5,6 +5,9 @@
  */
 package alann.ifpb;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 /**
  *
  * @author alann
@@ -13,10 +16,9 @@ public class Main {
     
     public static void main(String[] args){
         
-        Operacao operacao = new Operacao();
-        Thread t1 = new Thread(operacao);
-        
-        t1.start();
+        ExecutorService executorService = Executors.newCachedThreadPool();
+        executorService.execute(new Operacao());
+        executorService.shutdown();
         
     }
     
