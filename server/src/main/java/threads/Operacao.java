@@ -3,48 +3,48 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package alann.ifpb;
+package threads;
 
+import buffer.BufferBlocking;
+import interfaces.Buffer;
 import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author alann
  */
-public class Server {
+public class Operacao implements Runnable {
 
-    public static void main(String args[]) throws Exception {
+    private final Buffer bufferEntrada;
+    private final Buffer bufferSaida;
 
-        int porta = 9876;
+    public Operacao(BufferBlocking bufferEntrada, BufferBlocking bufferSaida) {
+        this.bufferEntrada = bufferEntrada;
+        this.bufferSaida = bufferSaida;
+    }
 
-        DatagramSocket serverSocket = new DatagramSocket(porta);
+    @Override
+    public void run() {
 
         while (true) {
-
-            int tamanho = Integer.BYTES * 2 + Character.BYTES;
-            byte[] receiveData = new byte[tamanho];
-
-            DatagramPacket receivePacket = new DatagramPacket(receiveData,
-                    receiveData.length);
-            serverSocket.receive(receivePacket);
-
-            receiveData = receivePacket.getData();
-
-            InetAddress IPAddress = receivePacket.getAddress();
-
-            byte[] sendData = operacao(receiveData);
-
-            int port = receivePacket.getPort();
-
+            DatagramPacket receivePacket = bufferEntrada.get();
+            byte[] sendData = operacao(receivePacket.getData());
+            InetAddress IPAddress = null;
+            try {
+                IPAddress = InetAddress.getByName("localhost");
+            } catch (UnknownHostException ex) {
+                Logger.getLogger(Operacao.class.getName()).log(Level.SEVERE, null, ex);
+            }
             DatagramPacket sendPacket = new DatagramPacket(sendData,
-                    sendData.length, IPAddress, port);
-
-            serverSocket.send(sendPacket);
-
+                    sendData.length, IPAddress, 6789);
+            bufferSaida.set(sendPacket);
         }
+
     }
 
     public static byte[] operacao(byte[] receiveData) {
@@ -54,6 +54,8 @@ public class Server {
         int valor1 = bff.getInt();
         int valor2 = bff.getInt();
         char operacao = bff.getChar();
+        
+        System.out.println(valor1 + " " + operacao + " " + valor2);
 
         int resultadoOperacao;
 
@@ -85,4 +87,5 @@ public class Server {
         return valor1 - valor2;
 
     }
+
 }
