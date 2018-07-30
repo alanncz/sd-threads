@@ -33,7 +33,7 @@ public class Entrada implements Runnable {
 
         while (true) {
 
-            int tamanho = Integer.BYTES * 2 + Character.BYTES;
+            int tamanho = Integer.BYTES * 3 + Character.BYTES;
             byte[] receiveData = new byte[tamanho];
 
             DatagramPacket receivePacket = new DatagramPacket(receiveData,

@@ -5,6 +5,8 @@
  */
 package threads;
 
+import Monitor.DadosRequisicao;
+import Monitor.Monitor;
 import buffer.BufferBlocking;
 import interfaces.Buffer;
 import java.net.DatagramPacket;
@@ -21,6 +23,7 @@ import java.util.logging.Logger;
  */
 public class Operacao implements Runnable {
 
+    private static int idRequisicao = 0;
     private final Buffer bufferEntrada;
     private final Buffer bufferSaida;
 
@@ -29,16 +32,33 @@ public class Operacao implements Runnable {
         this.bufferSaida = bufferSaida;
     }
 
+    public static int getIdRequisicao() {
+        return idRequisicao;
+    }
+
+    public static void setIdRequisicao() {
+        Operacao.idRequisicao++;
+    }
+
     @Override
     public void run() {
 
         while (true) {
             DatagramPacket receivePacket = bufferEntrada.get();
             ByteBuffer bff = ByteBuffer.wrap(receivePacket.getData());
+            int idOperacaoAnterior = bff.getInt();
             int resultadoOperacaoAnterior = bff.getInt();
             byte[] sendData = criaOperacao(resultadoOperacaoAnterior);
-            System.out.println(resultadoOperacaoAnterior);
             
+            //monitorando requisicao
+            DadosRequisicao dadosRequisicao = new DadosRequisicao();
+            dadosRequisicao.setId(idRequisicao);
+            dadosRequisicao.setTempoInicio(Monitor.tempoInicio());
+            dadosRequisicao.setResultadoEsperado(Monitor.resultadoEsperado(sendData));
+            dadosRequisicao.setOperacao(Monitor.stringOperacao(sendData));
+            Monitor.put(dadosRequisicao);
+            idRequisicao++;
+
             InetAddress IPAddress = null;
             try {
                 IPAddress = InetAddress.getByName("localhost");
@@ -47,7 +67,7 @@ public class Operacao implements Runnable {
             }
             DatagramPacket sendPacket = new DatagramPacket(sendData,
                     sendData.length, IPAddress, 9876);
-            bufferSaida.set(sendPacket);                      
+            bufferSaida.set(sendPacket);
         }
     }
 
@@ -57,11 +77,15 @@ public class Operacao implements Runnable {
         int novoValor = gerador.nextInt(10);
         char operacao = 'n';
         int operacaoEscolha = gerador.nextInt(2);
-        if (operacaoEscolha == 0) operacao = '+';
-        else if (operacaoEscolha == 1)  operacao = '-';
-       
-        int tamanho = Integer.BYTES * 2 + Character.BYTES;
+        if (operacaoEscolha == 0) {
+            operacao = '+';
+        } else if (operacaoEscolha == 1) {
+            operacao = '-';
+        }
+
+        int tamanho = Integer.BYTES * 3 + Character.BYTES;
         ByteBuffer bff = ByteBuffer.allocate(tamanho);
+        bff.putInt(idRequisicao);
         bff.putInt(resultadoOperacaoAnterior);
         bff.putInt(novoValor);
         bff.putChar(operacao);

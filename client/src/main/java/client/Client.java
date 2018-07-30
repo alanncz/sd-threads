@@ -5,6 +5,8 @@
  */
 package client;
 
+import Monitor.DadosRequisicao;
+import Monitor.Monitor;
 import threads.Operacao;
 import threads.Saida;
 import threads.Entrada;
@@ -22,7 +24,7 @@ import java.util.concurrent.Executors;
  * @author alann
  */
 public class Client {
-    
+
     public static void main(String[] args) throws SocketException, UnknownHostException {
 
         BufferBlocking bufferEntrada = new BufferBlocking(1);
@@ -33,6 +35,15 @@ public class Client {
         int primeiroValor = gerador.nextInt(10);
 
         byte[] sendData = Operacao.criaOperacao(primeiroValor);
+
+        //monitorando  primeira requisicao
+        DadosRequisicao dadosRequisicao = new DadosRequisicao();
+        dadosRequisicao.setId(Operacao.getIdRequisicao());
+        Operacao.setIdRequisicao();
+        dadosRequisicao.setResultadoEsperado(Monitor.resultadoEsperado(sendData));
+        dadosRequisicao.setOperacao(Monitor.stringOperacao(sendData));
+        dadosRequisicao.setTempoInicio(Monitor.tempoInicio());
+        Monitor.put(dadosRequisicao);
 
         InetAddress IPAddress = InetAddress.getByName("localhost");
 

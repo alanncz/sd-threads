@@ -51,6 +51,7 @@ public class Operacao implements Runnable {
 
         ByteBuffer bff = ByteBuffer.wrap(receiveData);
 
+        int idOperacao = bff.getInt();
         int valor1 = bff.getInt();
         int valor2 = bff.getInt();
         char operacao = bff.getChar();
@@ -65,10 +66,11 @@ public class Operacao implements Runnable {
             resultadoOperacao = subtracao(valor1, valor2);
         }
 
-        int tamanho = Integer.BYTES;
+        int tamanho = Integer.BYTES * 2;
 
         ByteBuffer bff2 = ByteBuffer.allocate(tamanho);
 
+        bff2.putInt(idOperacao);
         bff2.putInt(resultadoOperacao);
 
         byte[] sendData = bff2.array();
