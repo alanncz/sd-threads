@@ -33,7 +33,6 @@ public class Saida implements Runnable {
         while (true) {
 
             DatagramPacket sendPacket = bufferSaida.get();
-
             try {
                 sendSocket.send(sendPacket);
             } catch (IOException ex) {

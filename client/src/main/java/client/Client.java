@@ -45,10 +45,10 @@ public class Client {
         dadosRequisicao.setTempoInicio(Monitor.tempoInicio());
         Monitor.put(dadosRequisicao);
 
-        InetAddress IPAddress = InetAddress.getByName("localhost");
+        InetAddress IPAddress = InetAddress.getByName("server-container");
 
         DatagramPacket sendPacket = new DatagramPacket(sendData,
-                sendData.length, IPAddress, 9876);
+                sendData.length, IPAddress, 6677);
 
         bufferSaida.set(sendPacket);
 
@@ -59,6 +59,7 @@ public class Client {
         executor.execute(new Operacao(bufferEntrada, bufferSaida));
 
         executor.shutdown();
+        System.out.println("Cliente executando...");
 
     }
 

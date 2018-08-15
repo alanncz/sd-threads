@@ -36,12 +36,12 @@ public class Operacao implements Runnable {
             byte[] sendData = operacao(receivePacket.getData());
             InetAddress IPAddress = null;
             try {
-                IPAddress = InetAddress.getByName("localhost");
+                IPAddress = InetAddress.getByName(receivePacket.getAddress().getHostName());
             } catch (UnknownHostException ex) {
                 Logger.getLogger(Operacao.class.getName()).log(Level.SEVERE, null, ex);
             }
             DatagramPacket sendPacket = new DatagramPacket(sendData,
-                    sendData.length, IPAddress, 6789);
+                    sendData.length, IPAddress, 6666);
             bufferSaida.set(sendPacket);
         }
 

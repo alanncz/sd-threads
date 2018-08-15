@@ -29,6 +29,7 @@ public class Server {
         executor.execute(new Operacao(bufferEntrada, bufferSaida));
         executor.execute(new Saida(bufferSaida));
         executor.shutdown();
+        System.out.println("Servidor executando...");
 
     }
 }

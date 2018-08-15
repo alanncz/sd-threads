@@ -24,7 +24,7 @@ public class Entrada implements Runnable {
     private final Buffer bufferShared;
 
     public Entrada(BufferBlocking bufferShared) throws SocketException {
-        this.serverSocket = new DatagramSocket(9876);
+        this.serverSocket = new DatagramSocket(6677);
         this.bufferShared = bufferShared;
     }
 

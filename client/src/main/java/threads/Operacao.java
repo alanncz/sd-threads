@@ -61,12 +61,12 @@ public class Operacao implements Runnable {
 
             InetAddress IPAddress = null;
             try {
-                IPAddress = InetAddress.getByName("localhost");
+                IPAddress = InetAddress.getByName("server-container");
             } catch (UnknownHostException ex) {
                 Logger.getLogger(Operacao.class.getName()).log(Level.SEVERE, null, ex);
             }
             DatagramPacket sendPacket = new DatagramPacket(sendData,
-                    sendData.length, IPAddress, 9876);
+                    sendData.length, IPAddress, 6677);
             bufferSaida.set(sendPacket);
         }
     }
